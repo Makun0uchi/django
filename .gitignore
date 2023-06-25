@@ -1,0 +1,6 @@
+.pyc
+__pycache__
+virtualvenv
+db.sqlite3
+./static
+.idea
