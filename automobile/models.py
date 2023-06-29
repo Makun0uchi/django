@@ -6,6 +6,8 @@ class Car(models.Model):
     car_brand = models.CharField(max_length=200)
     car_speed = models.IntegerField()
 
+    country_of_origin = models.ForeignKey('automobile.Country', on_delete=models.CASCADE, null=True)
+
     def __str__(self):
         return self.car_nums
     
@@ -21,10 +23,8 @@ class Spare(models.Model):
 
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
-    Country_code = models.IntegerField()
+    сountry_code = models.IntegerField()
     country_size = models.IntegerField()
-
-    car_from = models.ForeignKey('automobile.Car', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.country_name      
