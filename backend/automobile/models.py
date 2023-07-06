@@ -19,7 +19,7 @@ class Car(models.Model):
     car_speed = models.IntegerField()
 
     country_of_origin = models.ForeignKey('automobile.Country', on_delete=models.CASCADE, null=True)
-    for_car = models.ManyToManyField('automobile.Spare')
+    car_details = models.ManyToManyField('automobile.Spare')
 
     def __str__(self):
         return self.car_brand
