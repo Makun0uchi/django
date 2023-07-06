@@ -1,11 +1,5 @@
 Django~=3.2.12
 djangorestframework~=3.13.1
-pytz~=2022.1
-<<<<<<< HEAD
-<<<<<<< HEAD
-sqlparse~=0.4.2
 tzdata~=2022.1
-=======
->>>>>>> 2f581358dbd951b86c037c54de85ac5319a0bc49
-=======
->>>>>>> 2f581358dbd951b86c037c54de85ac5319a0bc49
+pytz~=2022.1
+sqlparse~=0.4.2
