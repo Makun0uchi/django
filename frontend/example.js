@@ -3,11 +3,13 @@ class Student {
     age;
     average;
     static maxAverage; // статическое поле "Макисмальный средний балл"
+    static objects = [];
 
     constructor (name, age, average) {
         this.name = name;
         this.age = age;
         this.average = average;
+        Student.objects.push(this);
     }
 
     // Увеличение возраста при каждом вызове
@@ -23,9 +25,9 @@ class Student {
     }
 
     // Статический метод "Получение максимального среднего балла"
-    static getMaxAverage = (students) => {
+    static getMaxAverage = () => {
         let maxA = 0;
-        for (let s of students) {
+        for (let s of this.objects) {
             s.average > maxA ? maxA = s.average : maxA = maxA;
         }
         this.maxAverage = maxA;
@@ -33,21 +35,17 @@ class Student {
 
     // Метод для получения статуса относительного среднего балла студента
     getStatus = () => {
-        let status = ((this.average >= 60) && (this.average < 75)) ? 'Троечник':
-        ((this.average >= 75) && (this.average < 90)) ? 'Хорошист':
-        (this.average >= 90) ? 'Отличник':
-        'Средний балл слишком низок :('; 
+        let status = 'Отличник';
+        if (this.average < 90) status = 'Хорошист';
+        if (this.average < 75) status = 'Троечник';
+        if (this.average < 60) status = 'Средний балл слишком низок :(';
 
-        return status;
+        return console.log(this.name, ' - ', status);
     }
 
     // Статический метод для получения списка студентов, среднйи балл которых выше определенного
-    static filterByScore = (score, students) => {
-        let list = [];
-        for (let s of students) {
-            if (s.average > score) list.push(s);
-        }
-        return list;
+    static filterByScore = (score) => {
+        return this.objects.filter(student => student.average > score);
     }
 
     // Метод для вывода информации о студенте чисто для удобства
@@ -58,18 +56,22 @@ class Student {
     }
 }
 
-let students = [
-    new Student('Влад', 20, 94),
-    new Student('Миша', 20, 67),
-    new Student('Петя', 22, 78),
-];
+let Vlad = new Student('Влад', 20, 94);
+let Misha = new Student('Миша', 20, 54);
+let Petya = new Student('Петя', 22, 78);
+let Kolya = new Student('Коля', 22, 66);
 
-for (let s of students) s.print();
+for (let s of Student.objects) s.print();
 
-Student.getMaxAverage(students);
+Student.getMaxAverage();
 console.log('Максимальный балл среди всех студентов: ', Student.maxAverage);
 
 let score = 70;
-filterBy70 = Student.filterByScore(score, students);
+filterByAny = Student.filterByScore(score);
 
-for (let s of filterBy70) s.print();
+for (let s of filterByAny) s.print();
+
+Vlad.getStatus();
+Misha.getStatus();
+Petya.getStatus();
+Kolya.getStatus();
