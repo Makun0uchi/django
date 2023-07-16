@@ -36,11 +36,9 @@ class Student {
     // Метод для получения статуса относительного среднего балла студента
     getStatus = () => {
         let status = 'Отличник';
-        if (this.average < 90) status = 'Хорошист';
-        if (this.average < 75) status = 'Троечник';
-        if (this.average < 60) status = 'Средний балл слишком низок :(';
-
-        return console.log(this.name, ' - ', status);
+        if (this.average >= 90) return console.log(this.name, ' - Отличник');
+        if (this.average >= 75) return console.log(this.name, ' - Хорошист');
+        if (this.average >= 60) return console.log(this.name, ' - Троечник');
     }
 
     // Статический метод для получения списка студентов, среднйи балл которых выше определенного
