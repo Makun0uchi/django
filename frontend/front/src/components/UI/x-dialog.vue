@@ -32,7 +32,8 @@ export default {
     left: 0;
     background: rgba(0,0,0, 0.5);
     position: fixed;
-    display: flex;    
+    display: flex;  
+    overflow-y: auto;
 }
 
 .x-dialog-container {

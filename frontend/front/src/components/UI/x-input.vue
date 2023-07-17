@@ -1,10 +1,15 @@
 <template>
-    <input class="x-input">
+    <input class="x-input" @input="updateInput">
 </template>
 
 <script>
 export default {
-    name: "x-input"
+    name: "x-input",
+    methods: {
+        updateInput(event) {
+            this.$emit('input', event.target.value)
+        }
+    }
 }
 </script>
 

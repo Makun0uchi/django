@@ -9,7 +9,9 @@
 export default {
     name: "x-select",
     props: {
-        sort_by_selected: String,
+        sort_by_selected: {
+            type: String
+        },
         sort_list: {
             type: Array,
             default: () => []
@@ -17,7 +19,7 @@ export default {
     },
     methods: {
         chooseSorting(target) {
-            const sort_by_selected = Array.from(target.sort_list).filter(choose => choose.selected).map(choose => choose.value);
+            const sort_by_selected = target.value;
             this.$emit("input", sort_by_selected);
         }
     }
