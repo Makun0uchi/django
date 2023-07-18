@@ -11,5 +11,5 @@ router.register(r'sparelist', SpareViewSet)
 router.register(r'countrylist', CountryViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls))
+    path('api/', include(router.urls)),
 ]

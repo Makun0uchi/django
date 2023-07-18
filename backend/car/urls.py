@@ -21,12 +21,6 @@ from rest_framework import routers
 from rest_framework.authtoken import views
 
 
-router = routers.DefaultRouter()
-router.register(r'carlist', CarViewSet)
-router.register(r'sparelist', SpareViewSet)
-router.register(r'countrylist', CountryViewSet)
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('automobile.urls')),

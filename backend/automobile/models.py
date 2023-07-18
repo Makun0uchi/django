@@ -35,7 +35,7 @@ class Spare(models.Model):
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
     country_size = models.IntegerField()
-    сountry_num = models.CharField(max_length=10)
+    country_num = models.CharField(max_length=10)
 
     def __str__(self):
         return self.country_name    
