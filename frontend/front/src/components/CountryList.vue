@@ -10,13 +10,15 @@
                     <th>Название</th>
                     <th>Размер</th>
                     <th>Код</th>
+                    <th colspan="2">Действия</th>
                 </tr>
-                <tr v-for="country, index in SearchInSortedCountries" :key="index">
+                <tr v-for="country in SearchInSortedCountries" :key="`country-${country}`">
                     <td>{{ country.id }}</td>
                     <td>{{ country.country_name }}</td>
                     <td>{{ country.country_size }}</td>
-                    <td>{{ country.country_code }}</td>
-                    <td><x-button class="x-delete" @click="deletingCountry(index)">x</x-button></td>
+                    <td>{{ country.country_num }}</td>
+                    <td><x-button class="x-delete" @click="deletingCountry(country)">x</x-button></td>
+                    <td><x-button class="x-edit" @click="editingCountry(country)">Изменить</x-button></td>
                 </tr>
             </table>
             <div v-else class="x-countrylist-empty"><strong>Список пуст</strong></div>
@@ -26,17 +28,19 @@
             <x-input placeholder="Поиск..." class="search-input" v-model="search_text" />
             <x-button class="x-countrylist-add" @click="toggleCreateCountryForm">{{ btnText }}</x-button>
         </div>
-        <div class="x-countrylist-create-country" v-if="showCreateCountryForm">
-            <header class="x-countrylist-create-country-header">
-                <h1>Добавление новой страны</h1>
-            </header>
-            <div class="x-countrylist-create-country-form">
-                <x-input type="text" class="item" placeholder="Введите название страны..." v-model.trim="country.country_name" />
-                <x-input type="number" class="item" placeholder="Введите размер страны..." v-model.trim="country.country_size" />
-                <x-input type="text" class="item" placeholder="Введите код страны..." v-model.trim="country.country_code" />
-                <x-button class="x-add-country" @click="addCountry">Добавить запись</x-button>
+        <transition name="fade">
+            <div class="x-countrylist-create-country" v-if="showCreateCountryForm">
+                <header class="x-countrylist-create-country-header">
+                    <h1>Добавление новой страны</h1>
+                </header>
+                <div class="x-countrylist-create-country-form">
+                    <x-input type="text" class="item" placeholder="Введите название страны..." v-model.trim="country.country_name" />
+                    <x-input type="number" class="item" placeholder="Введите размер страны..." v-model.trim="country.country_size" />
+                    <x-input type="text" class="item" placeholder="Введите код страны..." v-model.trim="country.country_num" />
+                    <x-button class="x-add-country" @click="addCountry">Добавить запись</x-button>
+                </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -48,7 +52,7 @@ export default {
             country: {
                 country_name: "",
                 country_size: "",
-                country_code: "",
+                country_num: "",
             },
 
             showCreateCountryForm: false,
@@ -72,16 +76,29 @@ export default {
         }
     },
     methods: {
-        deletingCountry(index) {
-            this.$emit('delete', index)
+        deletingCountry(country) {
+            this.$emit('delete', country)
+        },
+        editingCountry(country) {
+            this.$ajax.get(`api/countrylist/${country.id}`).then(() => {
+                this.$emit('editCountry', country)
+                this.$router.push(`updatecountry/${country.id}`,country.id)
+            })
         },
         addCountry() {
-            if ((this.country.country_name=="") || (this.country.country_size=="") || (this.country.country_code=="")) {
+            if ((this.country.country_name=="") || (this.country.country_size=="") || (this.country.country_num=="")) {
                 alert('Заполните форму!')
                 return
             }
 
-            this.$emit('create', {...this.country})
+            if (this.country.country_size <= 0) {
+                alert('Некорректные данные!')
+                return
+            }
+
+            this.$ajax.post("api/countrylist/", {...this.country}).then(() => {
+                this.$emit('create', {...this.country})
+            })
         },
         toggleCreateCountryForm() {
             this.showCreateCountryForm = !this.showCreateCountryForm
@@ -108,7 +125,7 @@ export default {
                     countriesCopy = countriesCopy.sort((a, b) => a.country_size - b.country_size)
                     break
                 case "По коду страны":
-                    countriesCopy = countriesCopy.sort((a, b) => a.country_code.localeCompare(b.country_code))
+                    countriesCopy = countriesCopy.sort((a, b) => a.country_num.localeCompare(b.country_num))
                     break
                 case "Сначала старые":
                     countriesCopy = countriesCopy.sort((a, b) => a.id - b.id)
@@ -140,6 +157,18 @@ export default {
 }
 th, td {
     padding: 5px;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+
+.x-edit {
+    background-color: rgba(0, 47, 255, 0.2) !important;
 }
 
 .x-countrylist-empty {

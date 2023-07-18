@@ -12,15 +12,17 @@
                     <th>Скорость</th>
                     <th>Страна-производитель</th>
                     <th>Детали</th>
+                    <th colspan="2">Действия</th>
                 </tr>
-                <tr v-for="car, index in SearchInSortedCars" :key="index">
+                <tr v-for="car in SearchInSortedCars" :key="`car-${car.id}`">
                     <td>{{ car.id }}</td>
                     <td>{{ car.car_nums }}</td>
                     <td>{{ car.car_brand }}</td>
                     <td>{{ car.car_speed }}</td>
                     <td>{{ car.country_of_origin }}</td>
                     <td>{{ car.car_details }}</td>
-                    <td><x-button class="x-delete" @click="deletingCar(index)">x</x-button></td>
+                    <td><x-button class="x-delete" @click="deletingCar(car.id)">x</x-button></td>
+                    <td><x-button class="x-edit" @click="editingCar(car)">Изменить</x-button></td>
                 </tr>
             </table>
             <div v-else class="x-carlist-empty"><strong>Список пуст</strong></div>
@@ -30,31 +32,33 @@
             <x-input placeholder="Поиск..." class="search-input" v-model="search_text" />
             <x-button class="x-carlist-add" @click="toggleCreateCarForm">{{ btnText }}</x-button>
         </div>
-        <div class="x-carlist-create-car" v-if="showCreateCarForm">
-            <header class="x-carlist-create-car-header">
-                <h1>Добавление новой машины</h1>
-            </header>
-            <div class="x-carlist-create-car-form">
-                <x-input type="text" class="item" placeholder="Введите номера машины..." v-model.trim="car.car_nums" />
-                <x-input type="text" class="item" placeholder="Введите марку машины" v-model.trim="car.car_brand" />
-                <x-input type="number" class="item" placeholder="Введите скорость машины..." v-model.trim="car.car_speed" />
-                <div class="selects">
-                    <select class="chooseCountry" v-model.trim="car.country_of_origin" >
-                        <option disabled selected value="">Выберите страну...</option>
-                        <option v-for="country in countries" :key="country.country_name" :value="country.country_name">
-                            {{ country.country_name }}
-                        </option>
-                    </select>
-                    <select multiple class="chooseSpares" v-model.trim="car.car_details">
-                        <option disabled selected value="">Выберите детали...</option>
-                        <option v-for="spare in spares" :key="spare.spares_name" :value="spare.spares_name">
-                            {{ spare.spares_name }}
-                        </option>
-                    </select>
+        <transition name="fade">
+            <div class="x-carlist-create-car" v-if="showCreateCarForm">
+                <header class="x-carlist-create-car-header">
+                    <h1>Добавление новой машины</h1>
+                </header>
+                <div class="x-carlist-create-car-form">
+                    <x-input type="text" class="item" placeholder="Введите номера машины..." v-model.trim="car.car_nums" />
+                    <x-input type="text" class="item" placeholder="Введите марку машины" v-model.trim="car.car_brand" />
+                    <x-input type="number" class="item" placeholder="Введите скорость машины..." v-model.trim="car.car_speed" />
+                    <div class="selects">
+                        <select class="chooseCountry" v-model.trim="car.country_of_origin" >
+                            <option disabled selected value="">Выберите страну...</option>
+                            <option v-for="country in countries" :key="country.country_name" :value="country.country_name">
+                                {{ country.country_name }}
+                            </option>
+                        </select>
+                        <select multiple class="chooseSpares" v-model.trim="car.car_details">
+                            <option disabled selected value="">Выберите детали...</option>
+                            <option v-for="spare in spares" :key="spare.spares_name" :value="spare.spares_name">
+                                {{ spare.spares_name }}
+                            </option>
+                        </select>
+                    </div>
+                    <x-button class="x-add-car" @click="addCar">Добавить запись</x-button>
                 </div>
-                <x-button class="x-add-car" @click="addCar">Добавить запись</x-button>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -101,10 +105,15 @@ export default {
         }
     },
     methods: {
-        deletingCar(index) {
-            this.$emit('delete', index)
+        deletingCar(id) {
+            this.$emit('delete', id)
         },
-
+        editingCar(car) {
+            this.$ajax.get(`api/carlist/${car.id}`).then(() => {
+                this.$emit('editCar', car)
+                this.$router.push(`updatecar/${car.id}`,car.id)
+            })
+        },
         toggleCreateCarForm() {
             this.showCreateCarForm = !this.showCreateCarForm
         },
@@ -114,7 +123,14 @@ export default {
                 return
             }
 
-            this.$emit('create', {...this.car})
+            if (this.car.car_speed <= 0) {
+                alert('Некорректные данные!')
+                return
+            }
+
+            this.$ajax.post("api/carlist/", {...this.car}).then(() => {
+                this.$emit('create', {...this.car})
+            })
         }
     },
     computed: {
@@ -197,6 +213,18 @@ th, td {
 .x-delete {
     background-color: rgba(255, 0, 0, 0.2) !important;
 }
+
+.x-edit {
+    background-color: rgba(0, 47, 255, 0.2) !important;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
 
 .x-carlist-add {
     background-color: rgba(173, 255, 47, 0.3) !important;

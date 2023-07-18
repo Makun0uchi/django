@@ -7,13 +7,19 @@
         на 16 день нужно выпить только чай". <br>
         На 16й день глист вылезает и спрашивает: -"а булочка где?". <br>
         </h4>
-        <x-button>Выход</x-button>
+        <x-button @click="logout">Выход</x-button>
     </div>
 </template>
 
 <script>
 export default {
     name: "AppHeader",
+    methods: {
+        logout() {
+            this.$store.commit('car/removeToken')
+            this.$router.push('/login')
+        }
+    }
 }
 </script>
 

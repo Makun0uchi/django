@@ -1,31 +1,27 @@
-<template>
-  <div class="main-block">
-    <app-header></app-header>
-    <app-content></app-content>
+<template>            
+  <div>
+      <router-view></router-view>
   </div>
 </template>
 
 <script>
-import AppHeader from './components/AppHeader.vue';
-import AppContent from './components/AppContent.vue';
-
 export default {
-  name: 'App',
-  components: {
-    AppHeader, AppContent
-  }
+  name: "App",
+  data() {
+    return {}
+  },
+  beforeCreate() {
+      const token = this.$store.state.token
+
+      if (token) {
+        this.$ajax.defaults.headers.common['Authorization'] = `Token ${token}`
+      } else {
+        this.$ajax.defaults.headers.common['Authorization'] = ""
+      }
+    },
 }
 </script>
 
-<style>
-.main-block {
-  width: 60%;
-  margin: 0 auto;
-}
-
-@font-face {
-  font-family: "Oldtimer";
-  src: local("Oldtimer"),
-  url(./fonts/ofont.ru_Oldtimer.ttf) format("truetype");
-}
+<style scoped>
+ 
 </style>

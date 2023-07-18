@@ -28,28 +28,20 @@ export default {
     },
     data() {
         return {
-            cars: [
-                {id: 1, car_nums: "111", car_brand: "Lada", car_speed: 200, country_of_origin: "Russia", car_details: [1, 2, 3]},
-                {id: 2, car_nums: "111", car_brand: "Lada", car_speed: 200, country_of_origin: "Russia", car_details: [1, 2, 3]},
-            ],
+            cars: [],
+            id: "",
             car_nums: "",
             car_brand: "",
             car_speed: "",
             country_of_origin: "",
             car_details: "",
 
-            countries: [
-                {id: 1, country_name: "Россия", country_size: 17100000, country_code: "+7"},
-                {id: 2, country_name: "Япония", country_size: 385000, country_code: "+81"},
-            ],
+            countries: [],
             country_name: "",
             country_size: "",
-            country_code: "",
+            country_num: "",
 
-            spares: [
-                {id: 1, spares_name: "Бензонасос", spares_num: "111", spares_price: 5200, spares_availability: true},
-                {id: 2, spares_name: "КПП", spares_num: "111", spares_price: 1200, spares_availability: true},
-            ],
+            spares: [],
             spares_name: "",
             spares_num: "",
             spares_price: "",
@@ -70,14 +62,25 @@ export default {
         toggleSpareList() {
             this.showSpareList = !this.showSpareList
         },
-        deletingCar(index) {
-            this.cars.splice(index, 1)
+        deletingCar(id) {
+            this.$ajax.delete(`api/carlist/${id}`)
+            this.cars = this.cars.filter(elem => elem.id !== id)
         },
-        deletingCountry(index) {
-            this.countries.splice(index, 1)
+        deletingCountry(country) {
+            if (this.cars.some(car => car.country_of_origin === country.country_name)) {
+                alert("Невозможное действие!")
+                return
+            } 
+            this.$ajax.delete(`api/countrylist/${country.id}`)
+            this.countries = this.countries.filter(elem => elem.id !== country.id)
         },
-        deletingSpare(index) {
-            this.spares.splice(index, 1)
+        deletingSpare(spare) {
+            if (this.cars.some(car => car.car_details == spare.spares_name)) {
+                alert("Невозможное действие!")
+                return
+            } 
+            this.$ajax.delete(`api/sparelist/${spare.id}`)
+            this.spares = this.spares.filter(elem => elem.id !== spare.id)
         },
         addCar(car) {
             car.id = this.cars.length + 1
@@ -91,6 +94,17 @@ export default {
             spare.id = this.spares.length + 1
             this.spares.push(spare)
         }
+    },
+    mounted() {
+        this.$ajax.get("api/carlist").then((response) => {
+            this.cars = response.data
+        }),
+        this.$ajax.get("api/sparelist").then((response) => {
+            this.spares = response.data
+        })
+        this.$ajax.get("api/countrylist").then((response) => {
+            this.countries = response.data
+        })
     }
 }
 </script>

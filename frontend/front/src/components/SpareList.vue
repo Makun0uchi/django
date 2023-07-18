@@ -11,14 +11,16 @@
                     <th>Номер</th>
                     <th>Стоимость</th>
                     <th>Наличие</th>
+                    <th colspan="2">Действия</th>
                 </tr>
-                <tr v-for="spare, index in SearchInSortedSpares" :key="index">
+                <tr v-for="spare in SearchInSortedSpares" :key="`spare-${spare.id}`">
                     <td>{{ spare.id }}</td>
                     <td>{{ spare.spares_name }}</td>
                     <td>{{ spare.spares_num }}</td>
                     <td>{{ spare.spares_price }}</td>
                     <td>{{ spare.spares_availability }}</td>
-                    <td><x-button class="x-delete" @click="deletingSpare(index)">x</x-button></td>
+                    <td><x-button class="x-delete" @click="deletingSpare(spare)">x</x-button></td>
+                    <td><x-button class="x-edit" @click="editingSpare(spare)">Изменить</x-button></td>
                 </tr>
             </table>
             <div v-else class="x-sparelist-empty"><strong>Список пуст</strong></div>
@@ -28,21 +30,23 @@
             <x-input placeholder="Поиск..." class="search-input" v-model="search_text" />
             <x-button class="x-sparelist-add" @click="toggleCreateSpareForm">{{ btnText }}</x-button>
         </div>
-        <div class="x-sparelist-create-spare" v-if="showCreateSpareForm">
-            <header class="x-sparelist-create-spare-header">
-                <h1>Добавление новой детали</h1>
-            </header>
-            <div class="x-sparelist-create-spare-form">
-                <x-input type="text" class="item" placeholder="Введите название детали..." v-model.trim="spare.spares_name" />
-                <x-input type="text" class="item" v-filter placeholder="Введите код детали..." v-model.trim="spare.spares_num" />
-                <x-input type="number" class="item" placeholder="Введите стоимость детали..." v-model.trim="spare.spares_price" />
-                <div class="spare-avai-check">
-                    <p>Наличие:</p>
-                    <x-input type="checkbox" class="spare-avai" v-model="spare.spares_availability" />
+        <transition name="fade">
+            <div class="x-sparelist-create-spare" v-if="showCreateSpareForm">
+                <header class="x-sparelist-create-spare-header">
+                    <h1>Добавление новой детали</h1>
+                </header>
+                <div class="x-sparelist-create-spare-form">
+                    <x-input type="text" class="item" placeholder="Введите название детали..." v-model.trim="spare.spares_name" />
+                    <x-input type="text" class="item" placeholder="Введите код детали..." v-model.trim="spare.spares_num" />
+                    <x-input type="number" class="item" placeholder="Введите стоимость детали..." v-model.trim="spare.spares_price" />
+                    <div class="spare-avai-check">
+                        <p>Наличие:</p>
+                        <x-input type="checkbox" class="spare-avai" v-model="spare.spares_availability" />
+                    </div>
+                    <x-button class="x-add-spare" @click="addSpare">Добавить запись</x-button>
                 </div>
-                <x-button class="x-add-spare" @click="addSpare">Добавить запись</x-button>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -79,8 +83,14 @@ export default {
         }
     },
     methods: {
-        deletingSpare(index) {
-            this.$emit('delete', index)
+        deletingSpare(spare) {
+            this.$emit('delete', spare)
+        },
+        editingSpare(spare) {
+            this.$ajax.get(`api/sparelist/${spare.id}`).then(() => {
+                this.$emit('editSpare', spare)
+                this.$router.push(`updatespare/${spare.id}`,spare.id)
+            })
         },
         addSpare() {
             if ((this.spare.spares_name=="") || (this.spare.spares_num=="") || (this.spare.spares_price=="")) {
@@ -89,12 +99,21 @@ export default {
             }
 
             if (this.spare.spares_availability=="on") {
-                this.spare.spares_availability=false
-            }
-            else {
                 this.spare.spares_availability=true
             }
-            this.$emit('create', {...this.spare})
+            else {
+                this.spare.spares_availability=false
+            }
+
+            if (this.spare.spares_price <= 0) {
+                alert('Некорректные данные!')
+                return
+            }
+
+            this.$ajax.post("api/sparelist/", {...this.spare}).then(() => {
+                this.$emit('create', {...this.spare})
+                this.spare.spares_availability=false
+            })
         },
         toggleCreateSpareForm() {
             this.showCreateSpareForm = !this.showCreateSpareForm
@@ -153,6 +172,17 @@ export default {
 }
 th, td {
     padding: 5px;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+.x-edit {
+    background-color: rgba(0, 47, 255, 0.2) !important;
 }
 
 .x-sparelist-empty {
