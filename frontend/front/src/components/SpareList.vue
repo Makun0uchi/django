@@ -88,8 +88,7 @@ export default {
         },
         editingSpare(spare) {
             this.$ajax.get(`api/sparelist/${spare.id}`).then(() => {
-                this.$emit('editSpare', spare)
-                this.$router.push(`updatespare/${spare.id}`,spare.id)
+                this.$router.push({name: `spareUpdate`, params: {id: spare.id, new_spare: spare}})
             })
         },
         addSpare() {

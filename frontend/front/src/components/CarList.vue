@@ -110,8 +110,7 @@ export default {
         },
         editingCar(car) {
             this.$ajax.get(`api/carlist/${car.id}`).then(() => {
-                this.$emit('editCar', car)
-                this.$router.push(`updatecar/${car.id}`,car.id)
+                this.$router.push({name: `carUpdate`, params: {id: car.id, new_car: car, countries: this.countries, spares: this.spares}})
             })
         },
         toggleCreateCarForm() {

@@ -34,6 +34,7 @@ export default {
     position: fixed;
     display: flex;  
     overflow-y: auto;
+    z-index: 2;
 }
 
 .x-dialog-container {

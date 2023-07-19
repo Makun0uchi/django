@@ -14,6 +14,7 @@ const routes = [
     {
         path: '/',
         component: CarPage,
+        name: 'main',
         meta: {requiresAuth: true}
     },
     {
@@ -22,18 +23,24 @@ const routes = [
         meta: {requiresAuth: false}
     },
     {
-        path: '/updatecar',
+        path: '/updatecar/:id',
         component: UpdateCarPage,
+        name: 'carUpdate',
+        props: true,
         meta: {requiresAuth: true}
     },
     {
-        path: '/updatespare',
+        path: '/updatespare/:id',
         component: UpdateSparePage,
+        name: 'spareUpdate',
+        props: true,
         meta: {requiresAuth: true}
     },
     {
-        path: '/updatecountry',
+        path: '/updatecountry/:id',
         component: UpdateCountryPage,
+        name: 'countryUpdate',
+        props: true,
         meta: {requiresAuth: true}
     }
 ]

@@ -12,7 +12,7 @@
                     <th>Код</th>
                     <th colspan="2">Действия</th>
                 </tr>
-                <tr v-for="country in SearchInSortedCountries" :key="`country-${country}`">
+                <tr v-for="country in SearchInSortedCountries" :key="`country-${country.id}`">
                     <td>{{ country.id }}</td>
                     <td>{{ country.country_name }}</td>
                     <td>{{ country.country_size }}</td>
@@ -81,8 +81,7 @@ export default {
         },
         editingCountry(country) {
             this.$ajax.get(`api/countrylist/${country.id}`).then(() => {
-                this.$emit('editCountry', country)
-                this.$router.push(`updatecountry/${country.id}`,country.id)
+                this.$router.push({name: `countryUpdate`, params: {id: country.id, new_country: country}})
             })
         },
         addCountry() {

@@ -26,6 +26,7 @@ export default {
     components: {
         CarList, CountryList, SpareList,
     },
+    inject: ['reload'],
     data() {
         return {
             cars: [],
@@ -85,14 +86,20 @@ export default {
         addCar(car) {
             car.id = this.cars.length + 1
             this.cars.push(car)
+            //location.reload()
+            this.reload()
         },
         addCountry(country) {
             country.id = this.countries.length + 1
             this.countries.push(country)
+            //location.reload()
+            this.reload()
         },
         addSpare(spare) {
             spare.id = this.spares.length + 1
             this.spares.push(spare)
+            //location.reload()
+            this.reload()
         }
     },
     mounted() {
